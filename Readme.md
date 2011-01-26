@@ -1,4 +1,4 @@
-A simple way of doing heavy work in a background process and when you really need the object it will block until it is done
+A simple way of doing heavy work in a background process and blocking until done when you really need the object.
 
 Preloading using the [proxy pattern](http://sourcemaking.com/design_patterns/proxy)
 Heavily inspired by Adam Sandersons [post](http://endofline.wordpress.com/2011/01/18/ruby-standard-library-delegator/)
@@ -15,21 +15,31 @@ you simply pass a block to Dunder.load with the expected class as the argument
 
 Usage
 
+	Dunder.load(Klass,instance = klass.new) {
+		# heavy stuff
+		value # value must be of Klass
+	}
+Read more further down
+	
 	lazy_foo = Dunder.load(String) {
 		# Simulate heavy IO
 		sleep 2
-		"bar" 
+		"foo" 
 	}
 	
 	
-	lazy_b = Dunder.load(String) {
+	lazy_bar = Dunder.load(String) {
 		# Simulate heavy IO
 		sleep 2
 		"bar" 
 	}
 	
-	puts lazy_bar
-	puts lazy_foo
+	# Do something other heavy
+
+	puts lazy_bar # => "bar"
+	puts lazy_bar.class # => String
+	puts lazy_foo # => "foo"
+	puts lazy_foo.class # => String
 	# Will finish after 2 seconds
 
 worth mentioning is that if you access the variable in someway before that it will block earlier
