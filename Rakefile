@@ -16,7 +16,13 @@ Jeweler::Tasks.new do |gem|
   gem.homepage = "http://github.com/Fonsan/dunder"
   gem.license = "MIT"
   gem.summary = %Q{A simple way of doing heavy work in a background process and when you really need the object it will block until it is done}
-  gem.description = %Q{A simple way of doing heavy work in a background process and when you really need the object it will block until it is done}
+  gem.description = %Q{For tasks that can be started early and evaluated late.
+
+  Typically one might want start multiple heavy tasks concurrent.
+  This is already solvable with threads or the [reactor-pattern](http://rubyeventmachine.com/) but setting this up could be cumbersome or require direct interactions with threads ex.
+
+  Dunder is a simple way of abstracting this:
+  you simply pass a block to Dunder.load with the expected class as the argument}
   gem.email = "fonsan@gmail.com"
   gem.authors = ["Fonsan"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,

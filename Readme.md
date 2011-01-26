@@ -5,19 +5,88 @@ Heavily inspired by Adam Sandersons [post](http://endofline.wordpress.com/2011/0
 
 Dunder
 =========================
+For tasks that can be started early and evaluated late.
 
+Typically one might want start multiple heavy tasks concurrent.
+This is already solvable with threads or the [reactor-pattern](http://rubyeventmachine.com/) but setting this up could be cumbersome or require direct interactions with threads ex.
+
+Dunder is a simple way of abstracting this:
+you simply pass a block to Dunder.load with the expected class as the argument
 
 Usage
-=====
-	lazy_bar = LazyLoad.load(String) {
+
+	lazy_foo = Dunder.load(String) {
 		# Simulate heavy IO
 		sleep 2
 		"bar" 
 	}
+	
+	
+	lazy_b = Dunder.load(String) {
+		# Simulate heavy IO
+		sleep 2
+		"bar" 
+	}
+	
 	puts lazy_bar
+	puts lazy_foo
+	# Will finish after 2 seconds
+
+worth mentioning is that if you access the variable in someway before that it will block earlier
+ex
+	lazy_array = Dunder.load(Array) do
+		sleep 1
+		[1,2,3]
+	end
+	puts lazy_array.length # <- will block here until the above sleep is done
+	sleep 1 # other heavy stuff
+	puts lazy_array # <- will be printed after 2 seconds
+	
+changing the order will fix this though
+
+	lazy_array = Dunder.load(Array) do
+		sleep 1
+		[1,2,3]
+	end
+	sleep 1 # other heavy stuff
+	puts lazy_array.length # <- will block here until the above sleep in the block is done
+	puts lazy_array # <- will be printed after 1 second
+	
+API
+	Dunder.load(Klass,instance = nil) {
+		#things to do
+		value
+	}
+Klass must be the class of value
+instance, During the process Dunder will call Klass.new if your class has a mandatory argument in initialize (the constructor) you could create a dummy instance yourself or you could set the return type to Array and return [value] and then use Dunder.load(Array) do [value] end.first
+	
+Rails
+
+	@lazy_posts = Dunder.load(Array) do
+		Post.all
+	end
+	@lazy_users = Dunder.load(Array) do
+		User.all
+	end
+	
+and then later in views
+
+	<%= @lazyposts.each do %> <- this will block until the posts have been loaded
+	...
+	<% end %>
+	
+
+Known problems
+
+it works with most types but has only been tested with 1.9.2
+Integer fails with
+	NotImplementedError: super from singleton method that is defined to multiple classes is not supported; 
+	this will be fixed in 1.9.3 or later	
+Or a SystemStackError: stack level too deep
+	
 Install
 =======
-    gem install xxxx
+    gem install dunder
 
 
 (The MIT License)

@@ -3,6 +3,7 @@ require 'delegate'
 
 class FutureArray < DelegateClass(Array ) 
   def initialize(&block)
+    super(Array.new)
     @_thread = Thread.start(&block)
   end
   
@@ -11,6 +12,7 @@ class FutureArray < DelegateClass(Array )
     super
   end
 end
+
 
 class Dunder
   
@@ -26,16 +28,23 @@ class Dunder
       end
       
       def __getobj__
-        __setobj__(@_thread.value) if @_thread.alive?
-        super
+        result = @_thread.value
+        __setobj__(result) if @_thread.alive?
+        
+        instance_eval do
+          def class
+            __getobj__.class
+          end
+        end
+        result
       end
+      
     end
     instance ||= klass.new
-    
     def c.lazy_instance
       instance
     end
-    
+
     c
   end
   
@@ -65,20 +74,5 @@ class Dunder
     lazy_class.new(&block)
   end
 end
-=begin
 
-puts Dunder.load(String) {
-  "hello"
-}
 
-puts Dunder.load(Integer) {
-  1
-}
-
-  puts Dunder.load(String) {
-    #Slow
-    sleep 2
-    "fubar"
-  }
-
-=end
