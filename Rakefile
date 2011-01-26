@@ -15,8 +15,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "dunder"
   gem.homepage = "http://github.com/Fonsan/dunder"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{A simple way of doing heavy work in a background process and when you really need the object it will block until it is done}
+  gem.description = %Q{A simple way of doing heavy work in a background process and when you really need the object it will block until it is done}
   gem.email = "fonsan@gmail.com"
   gem.authors = ["Fonsan"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,
