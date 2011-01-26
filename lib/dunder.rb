@@ -12,7 +12,7 @@ class FutureArray < DelegateClass(Array )
   end
 end
 
-class LazyLoad
+class Dunder
   
   def self.create_lazy_class(klass,instance = nil)
     c = Class.new(DelegateClass(klass)) do 
@@ -66,20 +66,16 @@ class LazyLoad
   end
 end
 =begin
-{
-  String => lambda { "hello" },
-  Integer => lambda { 1 }
-}
 
-puts LazyLoad.load(String) {
+puts Dunder.load(String) {
   "hello"
 }
 
-puts LazyLoad.load(Integer) {
+puts Dunder.load(Integer) {
   1
 }
 
-  puts LazyLoad.load(String) {
+  puts Dunder.load(String) {
     #Slow
     sleep 2
     "fubar"

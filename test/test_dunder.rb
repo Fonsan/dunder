@@ -1,7 +1,9 @@
 require 'helper'
 
 class TestDunder < Test::Unit::TestCase
-  should "probably rename this file and start testing for real" do
-    flunk "hey buddy, you should probably rename this file and start testing for real"
+  should "have some simple testing" do
+     assert_equal "bar",Dunder.load(String) {
+       "bar"
+     }
   end
 end
