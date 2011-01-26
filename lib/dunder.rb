@@ -65,7 +65,7 @@ class LazyLoad
     lazy_class.new(&block)
   end
 end
-
+=begin
 {
   String => lambda { "hello" },
   Integer => lambda { 1 }
@@ -85,5 +85,4 @@ puts LazyLoad.load(Integer) {
     "fubar"
   }
 
-
-
+=end
