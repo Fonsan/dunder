@@ -5,12 +5,18 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dunder}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Fonsan"]
   s.date = %q{2011-01-26}
-  s.description = %q{A simple way of doing heavy work in a background process and when you really need the object it will block until it is done}
+  s.description = %q{For tasks that can be started early and evaluated late.
+
+  Typically one might want start multiple heavy tasks concurrent.
+  This is already solvable with threads or the [reactor-pattern](http://rubyeventmachine.com/) but setting this up could be cumbersome or require direct interactions with threads ex.
+
+  Dunder is a simple way of abstracting this:
+  you simply pass a block to Dunder.load with the expected class as the argument}
   s.email = %q{fonsan@gmail.com}
   s.extra_rdoc_files = [
     "LICENSE.txt"
@@ -22,6 +28,7 @@ Gem::Specification.new do |s|
     "Rakefile",
     "Readme.md",
     "VERSION",
+    "dunder.gemspec",
     "lib/dunder.rb",
     "test/helper.rb",
     "test/test_dunder.rb"
