@@ -1,19 +1,4 @@
-# From http://endofline.wordpress.com/2011/01/18/ruby-standard-library-delegator/
 require 'delegate'
-
-class FutureArray < DelegateClass(Array ) 
-  def initialize(&block)
-    super(Array.new)
-    @_thread = Thread.start(&block)
-  end
-  
-  def __getobj__
-    __setobj__(@_thread.value) if @_thread.alive?
-    super
-  end
-end
-
-
 class Dunder
   
   def self.create_lazy_class(klass,instance = nil)
@@ -28,15 +13,16 @@ class Dunder
       end
       
       def __getobj__
-        result = @_thread.value
-        __setobj__(result) if @_thread.alive?
-        
-        instance_eval do
-          def class
-            __getobj__.class
+        if @_thread.alive?
+          result = @_thread.value
+          __setobj__(result)
+          instance_eval do
+            def class
+              __getobj__.class
+            end
           end
         end
-        result
+        super
       end
       
     end
@@ -44,7 +30,6 @@ class Dunder
     def c.lazy_instance
       instance
     end
-
     c
   end
   
@@ -74,5 +59,42 @@ class Dunder
     lazy_class.new(&block)
   end
 end
+class Dunder::Dispacter
+  def initialize(object,klass)
+    @_dunder_object = object
+    @_dunder_klass = klass
+  end
+  
+  # Maybe theres a better way to do this through delegate
+  def method_missing(method_sym, *arguments, &block)
+    Dunder.load(@_dunder_klass) do
+      @_dunder_object.send(method_sym, *arguments,&block)
+    end
+  end
+end
 
+
+class Object
+  def dunder_load(klass = nil)
+    klass ||= self.class
+    Dunder::Dispacter.new(self,klass)
+  end
+end
+
+# A non dynamic example for Array
+class FutureArray < DelegateClass(Array ) 
+  def initialize(&block)
+    super(Array.new)
+    @_thread = Thread.start(&block)
+  end
+  
+  def __getobj__
+    __setobj__(@_thread.value) if @_thread.alive?
+    super
+  end
+  
+  def class
+    __getobj__.class
+  end
+end
 
