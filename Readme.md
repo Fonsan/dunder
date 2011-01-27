@@ -19,6 +19,21 @@ Usage
 		# heavy stuff
 		value # value must be of Klass
 	}
+
+or	
+
+	lazy_obj = obj.dunder_load.do_something_heavy(a,b,c) {
+		#maybe something other heavy here
+	}
+	
+	lazy_sorted_articles = @articles.dunder_load.sort_by do |a|
+		a.title
+	end
+	
+	lazy_sorted_array = array.dunder_load.sort
+	
+This is still very beta, any bug reports or patches are welcome
+	
 Read more further down
 	
 	lazy_foo = Dunder.load(String) {
@@ -71,6 +86,7 @@ Klass must be the class of value
 instance, During the process Dunder will call Klass.new if your class has a mandatory argument in initialize (the constructor) you could create a dummy instance yourself or you could set the return type to Array and return [value] and then use Dunder.load(Array) do [value] end.first
 	
 Rails
+====================
 
 	@lazy_posts = Dunder.load(Array) do
 		Post.all
