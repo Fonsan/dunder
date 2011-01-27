@@ -13,15 +13,16 @@ class Dunder
       end
       
       def __getobj__
-        result = @_thread.value
-        __setobj__(result) if @_thread.alive?
-        
-        instance_eval do
-          def class
-            __getobj__.class
+        if @_thread.alive?
+          result = @_thread.value
+          __setobj__(result)
+          instance_eval do
+            def class
+              __getobj__.class
+            end
           end
         end
-        result
+        super
       end
       
     end
@@ -73,7 +74,7 @@ class Dunder::Dispacter
 end
 
 
-def String
+class Object
   def dunder_load(klass = nil)
     klass ||= self.class
     Dunder::Dispacter.new(self,klass)
