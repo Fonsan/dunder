@@ -2,35 +2,27 @@ require 'delegate'
 class Dunder
   
   def self.create_lazy_class(klass,instance = nil)
+    instance ||= klass.new
+    
     c = Class.new(DelegateClass(klass)) do 
-      def lazy_instance
-        # Will be filled in later
-      end
       
-      def initialize(&block)
+      define_method :initialize do |&block|
         @_thread = Thread.start(&block)
-        super(self.lazy_instance)
+        super(instance)
       end
       
       def __getobj__
         if @_thread.alive?
-          result = @_thread.value
-          __setobj__(result)
+          __setobj__(@_thread.value)
           instance_eval do
             def class
               __getobj__.class
             end
           end
         end
-        super
+      super
       end
-      
-    end
-    instance ||= klass.new
-    def c.lazy_instance
-      instance
-    end
-    c
+     end
   end
   
   def self.create_lazy_class!(klass, instance = nil)
