@@ -6,7 +6,8 @@ class TestDunder < Test::Unit::TestCase
      lazy_b = nil
      assert_nothing_raised do
        Timeout::timeout(0.5) do
-       lazy_b = Dunder.load(String) {
+       
+       lazy_b = Dunder.load {
           sleep 1
           "bar"
         }
