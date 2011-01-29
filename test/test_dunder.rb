@@ -1,14 +1,30 @@
 require 'helper'
 require 'timeout'
+require 'active_record'
+
+ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory") 
+
+ActiveRecord::Schema.define(:version => 20100819090145) do
+
+  create_table "posts", :force => true do |t|
+    t.string "name"
+  end
+
+end
+
+class Post < ActiveRecord::Base; end
+
+Post.create!(name: "hello")
+
 class TestDunder < Test::Unit::TestCase
   should "have some simple testing" do
      b = "bar"
      lazy_b = nil
      assert_nothing_raised do
-       Timeout::timeout(0.5) do
+       Timeout::timeout(0.1) do
        
        lazy_b = Dunder.load {
-          sleep 1
+          sleep 0.2
           "bar"
         }
        end
@@ -28,11 +44,16 @@ class TestDunder < Test::Unit::TestCase
     end
     res = nil
     assert_nothing_raised do
-       Timeout::timeout(0.5) do
-       res = b.dunder_load.something_heavy { sleep 1 }
+       Timeout::timeout(0.2) do
+       res = b.dunder_load.something_heavy { sleep 0.1}
       end
     end
     assert_equal b,res
     assert_equal b.class,res.class
+  end
+  
+  should "respond to rails" do
+    assert Post.scoped.dunder
+    assert Post.dunder
   end
 end

@@ -34,6 +34,7 @@ class Dunder
        end
     end
   end
+  
 end
 
 class Object
@@ -41,10 +42,4 @@ class Object
     Dunder::Dispacter.new(self)
   end
 end
-
-
-
-
-
-
 
