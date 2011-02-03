@@ -1,45 +1,65 @@
 require 'delegate'
 class Dunder
   class Future < SimpleDelegator
+    @@_threads = {}
+    
+    attr_reader :_thread
+    
     def initialize(&block)
-      @_thread = Thread.start(&block)
+      @@_threads[(@_thread = Thread.start(&block)).object_id] = @_thread
     end
 
     def __getobj__
-      __setobj__(@_thread.value) if @_thread.alive?
+      __setobj__(@_thread.value) # if @_thread.alive? 
+      @@_threads.delete(@_thread.object_id)
       super
     end
     
     def class
       __getobj__.class
     end
+    
+    def self.ensure_threads_finished
+       @@_threads.values.each(&:join)
+    end
+    
+    # Kernel
+    at_exit do
+       ensure_threads_finished
+    end
   end
   
-  def self.load(&block)
-    Future.new(&block)
+  module DunderMethod
+    def self.lazy_load(&block)
+      Future.new(&block)
+    end  
   end
   
-  class Dispacter < SimpleDelegator
+  # include DunderMethod shoud work??
+  
+  def self.lazy_load(&block)
+    DunderMethod.lazy_load(&block)
+  end
+  
+  class Dispacter < (RUBY_VERSION > "1.9" ? BasicObject : Object)
     def initialize(object)
-       @_dunder_obj = object
+      @_dunder_obj = object
     end
-    
-    def class
-      @_dunder_obj.class
-    end
-    
+
     def method_missing(method_sym, *arguments,&block)
-       Dunder.load do
-          @_dunder_obj.send(method_sym, *arguments,&block)
-       end
+      return if method_sym == :lazy_load
+      DunderMethod.lazy_load do
+        @_dunder_obj.send(method_sym, *arguments,&block)
+      end
     end
   end
   
-end
-
-class Object
-  def dunder_load
-    Dunder::Dispacter.new(self)
+  # http://olabini.com/blog/2011/01/safeer-monkey-patching/
+  # This also works for Class methods since: Class.ancestors => [Class, Module, Object, Kernel, BasicObject] 
+  module Instance
+    def dunder_load
+      Dispacter.new(self)
+    end
   end
+  Object.send :include,Instance
 end
-
