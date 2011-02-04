@@ -12,4 +12,5 @@ group :development, :test do
   gem "jeweler", "~> 1.5.2"
   gem "rcov", ">= 0"
   gem 'sqlite3'
+  gem 'simplecov'
 end

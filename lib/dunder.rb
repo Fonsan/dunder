@@ -10,7 +10,7 @@ class Dunder
     end
 
     def __getobj__
-      __setobj__(@_thread.value) # if @_thread.alive? 
+      __setobj__(@_thread.value)
       @@_threads.delete(@_thread.object_id)
       super
     end
@@ -23,7 +23,7 @@ class Dunder
        @@_threads.values.each(&:join)
     end
     
-    # Kernel
+    # Kernel add exit hook to ensure all threads finishing before exiting
     at_exit do
        ensure_threads_finished
     end
@@ -34,9 +34,7 @@ class Dunder
       Future.new(&block)
     end  
   end
-  
-  # include DunderMethod shoud work??
-  
+
   def self.lazy_load(&block)
     DunderMethod.lazy_load(&block)
   end

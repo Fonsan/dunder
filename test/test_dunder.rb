@@ -1,77 +1,33 @@
 require 'helper'
-require 'timeout'
-require 'active_record'
-
-ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:") 
-silence_stream(STDOUT) do
-  ActiveRecord::Schema.define(:version => 20100819090145) do
-
-    create_table "posts", :force => true do |t|
-      t.string "name"
-    end
-
-  end
-end
-
-class Post < ActiveRecord::Base; end
-Post.create!(:name => "hello")
-
-class String
-  def heavy
-    sleep 0.2
-    self
-  end
-end
 
 class TestDunder < Test::Unit::TestCase
   
   should "have some simple testing" do
      b = "bar"
-     lazy_b = nil
-     assert_nothing_raised do
-       Timeout::timeout(0.1) do
-       lazy_b = Dunder.lazy_load {
-          sleep 0.2
-          "bar"
-        }
-       end
-     end
-     sleep 0.3
+     lazy_b = Dunder.lazy_load {
+        "bar"
+     }
      assert_equal b,lazy_b
      assert_equal b.class, lazy_b.class
   end
   
   should "respond to dunder_load" do
     assert Object.methods.include?(:dunder_load)
-    b = "bar"
-    res = nil
-    assert_nothing_raised do
-      Timeout::timeout(0.1) do
-       res = b.dunder_load.heavy
-      end
-    end
-    assert_equal b,res
-    assert_equal b.class,res.class
+    b = Moods.new
+    res = b.dunder_load.sleepy
+    assert_equal b.sleepy,res
+    assert_equal b.sleepy.class,res.class
   end
   
   should "respond to methods" do
     lazy_block = Dunder.lazy_load {
-      sleep 0.1
       []
     }
     assert lazy_block.respond_to?(:each)
+    
     b = "bar"
     lazy_method = b.dunder_load
     assert lazy_method.respond_to?(:downcase)
-  end
-  
-  should "block when exiting until done" do
-    lazy = Dunder.lazy_load {
-      sleep 0.1
-    }
-    assert lazy._thread.alive?
-    Dunder::Future.ensure_threads_finished
-    assert !lazy._thread.alive?
   end
   
   should "respond to class methods" do
@@ -79,7 +35,67 @@ class TestDunder < Test::Unit::TestCase
   end
   
   should "respond to rails" do
-    assert Post.scoped.dunder_load.all
-    assert Post.dunder_load.all
+    posts = Post.all
+    lazy = Dunder.lazy_load do 
+      Post.all 
+    end
+    assert posts == lazy
+    assert Post.scoped.dunder_load.all == posts
+    assert Post.dunder_load.all == posts
   end
+  
+  should "block when exiting until done" do
+    m = Mutex.new
+    m.lock
+    # Lazy Thread
+    lazy = Dunder.lazy_load {
+      m.lock
+    }
+    assert lazy._thread.alive?
+    m2 = Mutex.new
+    
+    #Cleaner thread
+    Thread.start do
+      m2.lock
+      Dunder::Future.ensure_threads_finished
+      m2.unlock
+    end
+    
+    # Block until cleaner thread has started
+    while !m2.locked?
+    end
+    
+    # Let the lazy thread finish
+    m.unlock  
+    
+    # Let the cleaner wait for the lazy thread and wait for the cleaner thread to finish
+    m2.lock
+    assert !lazy._thread.alive?
+  end
+  
+  should "be nonblocking " do
+    m = Mutex.new
+    m.lock
+    lazy = Dunder.lazy_load {
+      m.lock
+      m.unlock
+      "bar"
+    }
+    m.unlock
+    assert lazy == "bar"
+  end
+  
+  should "still work if block finishes before access" do
+    m = Mutex.new
+    m.lock
+    lazy = Dunder.lazy_load {
+      m.lock
+      "bar"
+    }
+    m.unlock
+    while lazy._thread.alive?
+    end
+    assert lazy == "bar"
+  end
+  
 end

@@ -31,7 +31,8 @@ Gem::Specification.new do |s|
     "dunder.gemspec",
     "lib/dunder.rb",
     "test/helper.rb",
-    "test/test_dunder.rb"
+    "test/test_dunder.rb",
+    ".gemtest"
   ]
   s.homepage = %q{http://github.com/Fonsan/dunder}
   s.licenses = ["MIT"]
