@@ -34,16 +34,6 @@ class TestDunder < Test::Unit::TestCase
     assert Object.dunder_load.name == Object.name
   end
   
-  should "respond to rails" do
-    posts = Post.all
-    lazy = Dunder.lazy_load do 
-      Post.all 
-    end
-    assert posts == lazy
-    assert Post.scoped.dunder_load.all == posts
-    assert Post.dunder_load.all == posts
-  end
-  
   should "block when exiting until done" do
     m = Mutex.new
     m.lock
@@ -96,6 +86,25 @@ class TestDunder < Test::Unit::TestCase
     while lazy._thread.alive?
     end
     assert lazy == "bar"
+  end
+  
+  should "respond to rails" do
+    posts = Post.all
+    lazy = Dunder.lazy_load do 
+      Post.all 
+    end
+    assert posts == lazy
+    assert Post.scoped.dunder_load.all == posts
+    assert Post.dunder_load.all == posts
+  end
+  
+  should "do calls in background if ActiveRecord is patched" do
+    posts = Post.all
+    Dunder.patch_active_record!
+    lazy = Post.all
+    # Not nice, but for now
+    assert Dunder::Future.threads.length > 0
+    assert lazy == posts
   end
   
 end

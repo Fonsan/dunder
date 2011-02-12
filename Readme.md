@@ -1,49 +1,48 @@
+
+Dunder
+=========================
+For tasks that can be started _early_ and evaluated _late_.
+
 A simple way of doing heavy work in a background process and blocking until done when you really need the object.
 
 Preloading using the [proxy pattern](http://sourcemaking.com/design_patterns/proxy)
 Heavily inspired by Adam Sandersons [post](http://endofline.wordpress.com/2011/01/18/ruby-standard-library-delegator/)
 
-Dunder
-=========================
-For tasks that can be started early and evaluated late.
-
+#### Description
 Typically one might want start multiple heavy tasks concurrent.
 This is already solvable with threads or the [reactor-pattern](http://rubyeventmachine.com/) but setting this up could be cumbersome or require direct interactions with threads ex.
 
 Dunder is a simple way of abstracting this:
-you simply pass a block to Dunder.load and Dunder will execute this in a thread behind the scenes.
+you simply pass a block to Dunder.lazy_load and Dunder will execute this in a thread behind the scenes.
 When later accessing the lazy_object will block until the thread is done and has returned or if the thread is done returns the value
 
-The implementation itself relies only on the ruby standard library and is below 50 lines of code
+The implementation itself relies only on the ruby standard library
 
 Usage
 
-	lazy_object = Dunder.load {
+	lazy_object = Dunder.lazy_load {
 		# heavy stuff
 		value
 	}
 
 or through dunder_load
 	
-	lazy_sorted_articles = @articles.dunder_load.sort_by do |a|
-		a.title
-	end
-	
 	lazy_sorted_array = array.dunder_load.sort
 	
+	# With arguments and block
 	lazy_obj = obj.dunder_load.do_something_heavy(a,b,c) {
 		#maybe something other heavy here
 	}
 	
-Read more further down
+Paralell example
 	
-	lazy_foo = Dunder.load {
+	lazy_foo = Dunder.lazy_load {
 		# Simulate heavy IO
 		sleep 2
 		"foo" 
 	}
 	
-	lazy_bar = Dunder.load {
+	lazy_bar = Dunder.lazy_load {
 		# Simulate heavy IO
 		sleep 2
 		"bar" 
@@ -59,7 +58,8 @@ Read more further down
 
 worth mentioning is that if you access the variable in someway before that it will block earlier
 ex
-	lazy_array = Dunder.load do
+
+	lazy_array = Dunder.lazy_load do
 		sleep 1
 		[1,2,3]
 	end
@@ -69,7 +69,7 @@ ex
 	
 changing the order of the statements will fix this though
 
-	lazy_array = Dunder.load do
+	lazy_array = Dunder.lazy_load do
 		sleep 1
 		[1,2,3]
 	end
@@ -81,19 +81,17 @@ changing the order of the statements will fix this though
 Rails
 ====================
 
-	@lazy_posts = Dunder.load do
-		Post.all
-	end
-	@lazy_users = Dunder.load do
-		User.all
-	end
+	# Will not block
+	@lazy_posts = Post.dunder_load.all
+	
+	@lazy_user = User.dunder_load.first
 	
 and then later in views
 
-	<%= @lazyposts.each do %> <- this will block until the posts have been loaded
+	<%= @user.name %> <-  will block until the user have been loaded
+	<%= @lazyposts.each do %> <- will block until the posts have been loaded
 	...
-	<% end %>
-	
+	<% end %
 
 Known problems
 

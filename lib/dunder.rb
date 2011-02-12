@@ -1,7 +1,12 @@
 require 'delegate'
 class Dunder
+    
   class Future < SimpleDelegator
     @@_threads = {}
+    
+    def self.threads
+      @@_threads
+    end
     
     attr_reader :_thread
     
@@ -60,4 +65,10 @@ class Dunder
     end
   end
   Object.send :include,Instance
+  
+  def self.patch_active_record!
+    ActiveRecord::Relation.class_eval do
+      delegate :find_by_sql, :to => :dunder_load
+    end
+  end
 end
