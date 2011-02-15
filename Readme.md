@@ -11,6 +11,8 @@ Heavily inspired by Adam Sandersons [post](http://endofline.wordpress.com/2011/0
 To increase performance typically one might want start multiple heavy tasks concurrent.
 This is already solvable with threads or the [reactor-pattern](http://rubyeventmachine.com/) but setting this up could be cumbersome or require direct interactions with threads etc.
 
+What inspired me the ability to run concurrent database queries within a single request in rails, please read more in the section below. 
+
 How you could lazy load something today in ruby 1.9
 
 	foo = "foo"
@@ -157,6 +159,8 @@ and then later in views
 	<% end %
 Be careful not to use the mysql gem which blocks the whole universe on every call. Please use the mysql2 which is the standard adapter for rails since 3.0,
 also the pg gem works fine.
+
+For a sample application using mysql checkout [this](https://github.com/Fonsan/dunder-rails-demo)
 	
 Install
 =======
