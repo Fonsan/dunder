@@ -106,10 +106,9 @@ Ex
 	o == res # => false 
 	o == res._thread.value # => true
 
-But for Array,String,Fixnum,Hash etc things work fine.
+But Array,String,Fixnum,Hash etc work fine.
 
 If you want to be sure that nothing fishy is going on please use ._thread.value
-Ex
 
 Groups
 ====================
