@@ -11,7 +11,7 @@ Heavily inspired by Adam Sandersons [post](http://endofline.wordpress.com/2011/0
 To increase performance typically one might want start multiple heavy tasks concurrent.
 This is already solvable with threads or the [reactor-pattern](http://rubyeventmachine.com/) but setting this up could be cumbersome or require direct interactions with threads etc.
 
-What inspired me the ability to run concurrent database queries within a single request in rails, please read more in the section below. 
+What inspired me was the ability to run concurrent database queries within a single request in rails, please read more in the section below. 
 
 How you could lazy load something today in ruby 1.9
 
