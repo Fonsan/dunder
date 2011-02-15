@@ -24,9 +24,11 @@ How you could lazy load something today in ruby 1.9
 	
 The Thread.start call would not block and execution would continue and when you need the value you could ask t.value for it
 
-Dunder is a simple way of abstracting this but does infact use threads behind the scenes:
-you simply pass a block to Dunder.lazy_load and Dunder will execute this in a thread behind the scenes.
-When later accessing the returned object, lets say: lazy_object will block until the thread is done and has returned or if the thread is done returns the value. Dunder will only be happy under 1.9.* because how blocks changed have changed. There also some caveats that you _should_ read about below
+Dunder is a simple way of abstracting this but does infact use threads behind the scenes: you simply pass a block to Dunder.lazy_load 
+When later accessing the returned object, 
+lets say: lazy_object will block until the thread is done and has returned or if the thread is done returns the value. 
+
+Dunder will only be happy under 1.9.* because how blocks changed have changed. There also some caveats that you _should_ read about below
 
 #### Usage
 
@@ -47,7 +49,7 @@ or through chaining with dunder_load which works for both objects and classes
 		#maybe something other heavy here
 	}
 	
-Paralell example
+Parallel example
 	
 	lazy_foo = Dunder.lazy_load {
 		# Simulate heavy work
