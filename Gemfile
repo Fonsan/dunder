@@ -7,5 +7,5 @@ group :development, :test do
   gem "jeweler", "~> 1.5.2"
   gem "rcov", ">= 0"
   gem 'sqlite3'
-  gem 'ruby-debug19'
+  gem (RUBY_VERSION > "1.9" ? 'ruby-debug19' : 'ruby-debug')
 end
