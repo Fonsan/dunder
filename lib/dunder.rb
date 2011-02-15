@@ -27,8 +27,8 @@ class Dunder
     def __getobj__
       # Optimizing a bit
       return super if @delegate_sd_obj
-      #__setobj__(@_thread.value)
-      @delegate_sd_obj = @_thread.value
+      __setobj__(@_thread.value)
+      #@delegate_sd_obj = @_thread.value
       if FORBIDDEN.include?(super.class)
         error = "Your block returned a #{super.class} and because of how ruby handles #{FORBIDDEN.join(", ")}"
         error << " the #{super.class} won't behave correctly. There are two known workarounds:"

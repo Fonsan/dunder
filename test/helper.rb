@@ -7,6 +7,7 @@ rescue Bundler::BundlerError => e
   $stderr.puts "Run `bundle install` to install missing gems"
   exit e.status_code
 end
+require 'ruby-debug'
 require 'test/unit'
 require 'shoulda'
 require 'timeout'
@@ -42,4 +43,16 @@ class Moods
 end
 
 class Test::Unit::TestCase
+  def setup
+
+   end
+
+   def teardown
+     Dunder::Future.threads.values.each do |t|
+       timeout = 0.5
+       unless t.join(timeout)
+         raise "#{t} did not finish in #{timeout} seconds"
+       end
+     end
+   end
 end
