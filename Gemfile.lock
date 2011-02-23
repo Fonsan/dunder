@@ -37,10 +37,12 @@ GEM
       archive-tar-minitar (>= 0.5.2)
     shoulda (2.11.3)
     sqlite3 (1.3.3)
+    sqlite3 (1.3.3-x86-mingw32)
     tzinfo (0.3.24)
 
 PLATFORMS
   ruby
+  x86-mingw32
 
 DEPENDENCIES
   activerecord (>= 3.0.3)
