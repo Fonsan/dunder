@@ -125,7 +125,7 @@ class Dunder
   end
   
   # There maybe a better way of doing this
-  class Dispacter < (RUBY_VERSION > "1.9" ? BasicObject : Object)
+  class Dispatcher < (RUBY_VERSION > "1.9" ? BasicObject : Object)
     def initialize(object,group = nil)
       @_dunder_group = group
       @_dunder_obj = object
@@ -143,7 +143,7 @@ class Dunder
   # This also works for Class methods since: Class.ancestors => [Class, Module, Object, Kernel, BasicObject] 
   module Instance
     def dunder_load(group = nil)
-      Dispacter.new(self,group)
+      Dispatcher.new(self,group)
     end
   end
   Object.send :include,Instance
