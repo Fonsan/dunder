@@ -74,13 +74,14 @@ class Dunder
     
     def start_thread(&block)
       group = self
+      current = Thread.current
       Thread.start {
         group.init_thread
         begin
           value = block.call
         rescue
           value = nil
-          raise
+          current.raise
         ensure
           group.finish_thread
           value

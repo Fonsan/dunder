@@ -21,19 +21,23 @@ class TestDunderGroup < Test::Unit::TestCase
     assert b, t.value
   end
 
-  should "queue next thread upon thread crashing from excpetion" do
+  should "queue next thread upon thread crashing from exception" do
     g = Dunder::Group.new(1)
 
     g.lazy_load {
       Thread.current.kill
     }
     m = Mutex.new
-    m.lock
-    res = g.lazy_load {
-      m.lock
-    }
     assert_raise RuntimeError do
-      res._thread.raise "my voice"
+      
+      res = g.lazy_load {
+        raise "my voice"
+        
+      }
+      while res._thread.alive?
+        
+      end
+      
     end
     res = g.lazy_load {
       true
