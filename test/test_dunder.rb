@@ -24,6 +24,20 @@ class TestDunder < Test::Unit::TestCase
     end
   end
   
+  should "not raise if user is catching" do
+    assert_nothing_raised do
+      begin
+        res = Dunder.lazy_load {
+          raise "should be caught"
+          "bar"
+        }
+        assert res == "bar"
+      rescue
+
+      end
+    end
+  end
+  
   should "raise when returning forbidden objects" do
     assert_raise ArgumentError do
       res = Dunder.lazy_load {

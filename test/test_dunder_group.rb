@@ -29,10 +29,8 @@ class TestDunderGroup < Test::Unit::TestCase
     }
     m = Mutex.new
     assert_raise RuntimeError do
-      
       res = g.lazy_load {
         raise "my voice"
-        
       }
       while res._thread.alive?
         

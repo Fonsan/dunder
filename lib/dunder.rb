@@ -20,7 +20,16 @@ class Dunder
     
     def initialize(group = nil,&block)
       raise ArgumentError,"No block was passed for execution" unless block
-      @_thread = group ? group.start_thread(&block) : Thread.start(&block)
+      current = Thread.current
+      job = lambda {
+        value = nil
+        begin
+          value = block.call
+        rescue
+          current.raise
+        end
+      }
+      @_thread = group ? group.start_thread(&job) : Thread.start(&job)
       @@threads[@_thread.object_id] = @_thread
     end
 
@@ -74,18 +83,15 @@ class Dunder
     
     def start_thread(&block)
       group = self
-      current = Thread.current
       Thread.start {
         group.init_thread
+        value = nil
         begin
           value = block.call
-        rescue
-          value = nil
-          current.raise
         ensure
           group.finish_thread
-          value
         end
+        value
       }
     end
     
@@ -118,7 +124,7 @@ class Dunder
   
   # Kernel add exit hook to ensure all threads finishing before exiting
   at_exit do
-     Future.ensure_threads_finished
+    Future.ensure_threads_finished
   end
   
   module DunderMethod
