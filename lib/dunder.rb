@@ -76,9 +76,15 @@ class Dunder
       group = self
       Thread.start {
         group.init_thread
-        value = block.call
-        group.finish_thread
-        value
+        begin
+          value = block.call
+        rescue
+          value = nil
+          raise
+        ensure
+          group.finish_thread
+          value
+        end
       }
     end
     
